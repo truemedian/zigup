@@ -1,9 +1,9 @@
 #!/usr/bin/env sh
 set -ex
 
-rm -rf scratch
-mkdir scratch
-mkdir scratch/install scratch/bin
+#rm -rf scratch
+#mkdir scratch
+#mkdir scratch/install scratch/bin
 
 zigup="./zig-cache/bin/zigup --install-dir scratch/install --path-link scratch/bin/zig"
 
@@ -18,9 +18,25 @@ $zigup master
 $zigup list
 $zigup default 0.5.0
 # $zigup default master
-touch scratch/install/0.5.0/keep
+
+compiler_count=$(find scratch/install -mindepth 1 -maxdepth 1 -type d | wc -l)
+test "$compiler_count" = 2
+
 touch scratch/install/master/keep
 $zigup clean # should do nothing because we keep master and 0.5.0
+
+compiler_count=$(find scratch/install -mindepth 1 -maxdepth 1 -type d | wc -l)
+test "$compiler_count" = 2
+
 rm scratch/install/master/keep
 $zigup clean # deletes master
+
+compiler_count=$(find scratch/install -mindepth 1 -maxdepth 1 -type d | wc -l)
+test "$compiler_count" = 1
+
 $zigup master
+
+compiler_count=$(find scratch/install -mindepth 1 -maxdepth 1 -type d | wc -l)
+test "$compiler_count" = 2
+
+echo Success
